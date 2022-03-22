@@ -12,7 +12,6 @@ sysdb = mysql.connect(
 
 mycursor = sysdb.cursor()
 
-
 def fetch_data():
     url = "https://gis.taiwan.net.tw/XMLReleaseALL_public/restaurant_C_f.json"
     #(Reference: https://data.gov.tw/dataset/7779)
@@ -31,15 +30,19 @@ def fetch_data():
     restaurant_picture = [] #餐廳照片
     id = 0
     image_id = []
-
+    restaurant_id = []
     for i in source:
+        id += 1
         restaurant_name.append(i["Name"])
         restaurant_region.append(i["Region"])
         restaurant_tel.append(i["Tel"])
         restaurant_description.append(i["Description"])
         restaurant_address.append(i["Add"])
-        restaurant_opentime.append(i["Opentime"])
-        id += 1
+        if i["Opentime"] == "":
+            restaurant_opentime.append("None")
+        else:
+            restaurant_opentime.append(i["Opentime"])
+        restaurant_id.append(id)
         if i["Picture1"] == "":
             restaurant_picture.append("None")
             image_id.append(id)
@@ -59,22 +62,31 @@ def fetch_data():
             restaurant_picture.append(i["Picture3"])
             image_id.append(id)        
         
-    return [restaurant_name, restaurant_region, restaurant_tel, restaurant_description, restaurant_address, restaurant_opentime, restaurant_picture,image_id]
+    return [restaurant_name, restaurant_region, restaurant_tel, restaurant_description, restaurant_address, restaurant_opentime, restaurant_picture,restaurant_id,image_id]
 
 data = fetch_data()
+# print(data[3][600])
+data3 = []
+for error in data[3]:
+    fix = error.replace("\""," ")
+    data3.append(fix)
+
+
+
 
 for name,region,tel in zip(data[0],data[1],data[2]):
-    sql = f'''INSERT INTO restaurant_service.restaurant(name,region,Tel) VALUES("{name}","{region}","{tel}")'''
+    sql = f'''INSERT INTO restaurant_service.restaurant(name,region,Tel) VALUES("{name}" , "{region}" , "{tel}")'''
     mycursor.execute(sql)
-
+sysdb.commit()
+print(11)
 # 下面兩個還要加 restaurant_id 要想一下
-restaurant_id = 0
-for description,address,opentime in zip(data[3],data[4],data[5]):
-    restaurant_id += 1
+for description,address,opentime,restaurant_id in zip(data3,data[4],data[5],data[7]):
     sql = f'''INSERT INTO restaurant_service.detail(
-        description,address,opentime,restaurant_id) VALUES("{description}","{address}","{opentime}","{restaurant_id}")'''
+        description,address,opentime,restaurant_id) VALUES("{description}" , {address} , {opentime} , {restaurant_id})'''
     mycursor.execute(sql)
+sysdb.commit()
 
-for pic,restaurant_id in zip(data[6],data[7]):
-    sql = f'''INSERT INTO restaurant_service.images(image,restaurant_id) VALUES("{pic}","{restaurant_id}")'''
+for pic,restaurant_id in zip(data[6],data[8]):
+    sql = f'''INSERT INTO restaurant_service.images(image,restaurant_id) VALUES("{pic}" , {restaurant_id})'''
     mycursor.execute(sql)
+sysdb.commit()
