@@ -67,11 +67,14 @@ def fetch_data():
 data = fetch_data()
 # print(data[3][600])
 data3 = []
-for error in data[3]:
-    fix = error.replace("\""," ")
+for err in data[3]:
+    fix = err.replace("\""," ")
     data3.append(fix)
 
-
+data5 =[]
+for open in data[5]:
+    time = open.replace("\""," ")
+    data5.append(time)
 
 
 for name,region,tel in zip(data[0],data[1],data[2]):
@@ -80,9 +83,9 @@ for name,region,tel in zip(data[0],data[1],data[2]):
 sysdb.commit()
 print(11)
 # 下面兩個還要加 restaurant_id 要想一下
-for description,address,opentime,restaurant_id in zip(data3,data[4],data[5],data[7]):
+for description,address,opentime,restaurant_id in zip(data3,data[4],data5,data[7]):
     sql = f'''INSERT INTO restaurant_service.detail(
-        description,address,opentime,restaurant_id) VALUES("{description}" , {address} , {opentime} , {restaurant_id})'''
+        description,address,opentime,restaurant_id) VALUES("{description}" ,"{address}" ,"{opentime}" ,{restaurant_id})'''
     mycursor.execute(sql)
 sysdb.commit()
 
