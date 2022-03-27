@@ -13,9 +13,9 @@ CREATE TABLE IF NOT EXISTS restaurant(
 
 CREATE TABLE IF NOT EXISTS detail(
     id INT NOT NULL AUTO_INCREMENT,
-    description VARCHAR(255),
+    description VARCHAR(500),
     address VARCHAR(255),
-    opentime VARCHAR(200),
+    opentime VARCHAR(500),
     restaurant_id INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (restaurant_id) REFERENCES restaurant(id)
