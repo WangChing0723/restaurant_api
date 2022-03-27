@@ -80,19 +80,19 @@ for data5_error in data[5]:
 
 for name,region,tel in zip(data[0],data[1],data[2]):
     sql = 'INSERT INTO restaurant_service.restaurant(name,region,Tel) VALUES(%s, %s, %s)'
-    value = (f"{name}" , f"{region}" , f"{tel}")
+    value = (name, region, tel)
     mycursor.execute(sql,value)
 sysdb.commit()
 
 # 下面兩個還要加 restaurant_id 要想一下
 for description,address,opentime,restaurant_id in zip(data3,data[4],data5,data[7]):
     sql = 'INSERT INTO restaurant_service.detail(description,address,opentime,restaurant_id) VALUES(%s, %s, %s, %s)'
-    value = (f"{description}" , f"{address}" , f"{opentime}",f"{restaurant_id}")
+    value = (description, address, opentime, restaurant_id)
     mycursor.execute(sql,value)
 sysdb.commit()
 
 for pic,restaurant_id in zip(data[6],data[8]):
     sql = 'INSERT INTO restaurant_service.images(image,restaurant_id) VALUES(%s, %s)'
-    value = (f"{pic}" , f"{restaurant_id}")
+    value = (pic, restaurant_id)
     mycursor.execute(sql,value)
 sysdb.commit()
