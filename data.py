@@ -2,12 +2,13 @@ from email.mime import image
 import requests as req
 import json
 import mysql.connector as mysql
+import key
 
 # 建立python與mysql的連線
 sysdb = mysql.connect(
     host = "side-projects.mysql.database.azure.com",
-    user = "admin123@side-projects",
-    password = "Awan123!"
+    user = key.db_user(),
+    password = key.db_password()
 )
 
 mycursor = sysdb.cursor()
@@ -67,29 +68,31 @@ def fetch_data():
 data = fetch_data()
 # print(data[3][600])
 data3 = []
-for err in data[3]:
-    fix = err.replace("\""," ")
-    data3.append(fix)
+for data3_error in data[3]:
+    data3_solution = data3_error.replace("\""," ")
+    data3.append(data3_solution)
 
 data5 =[]
-for open in data[5]:
-    time = open.replace("\""," ")
-    data5.append(time)
+for data5_error in data[5]:
+    data5_solution = data5_error.replace("\""," ")
+    data5.append(data5_solution)
 
 
 for name,region,tel in zip(data[0],data[1],data[2]):
-    sql = f'''INSERT INTO restaurant_service.restaurant(name,region,Tel) VALUES("{name}" , "{region}" , "{tel}")'''
-    mycursor.execute(sql)
+    sql = 'INSERT INTO restaurant_service.restaurant(name,region,Tel) VALUES(%s, %s, %s)'
+    value = (f"{name}" , f"{region}" , f"{tel}")
+    mycursor.execute(sql,value)
 sysdb.commit()
-print(11)
+
 # 下面兩個還要加 restaurant_id 要想一下
 for description,address,opentime,restaurant_id in zip(data3,data[4],data5,data[7]):
-    sql = f'''INSERT INTO restaurant_service.detail(
-        description,address,opentime,restaurant_id) VALUES("{description}" ,"{address}" ,"{opentime}" ,{restaurant_id})'''
-    mycursor.execute(sql)
+    sql = 'INSERT INTO restaurant_service.detail(description,address,opentime,restaurant_id) VALUES(%s, %s, %s, %s)'
+    value = (f"{description}" , f"{address}" , f"{opentime}",f"{restaurant_id}")
+    mycursor.execute(sql,value)
 sysdb.commit()
 
 for pic,restaurant_id in zip(data[6],data[8]):
-    sql = f'''INSERT INTO restaurant_service.images(image,restaurant_id) VALUES("{pic}" , {restaurant_id})'''
-    mycursor.execute(sql)
+    sql = 'INSERT INTO restaurant_service.images(image,restaurant_id) VALUES(%s, %s)'
+    value = (f"{pic}" , f"{restaurant_id}")
+    mycursor.execute(sql,value)
 sysdb.commit()
